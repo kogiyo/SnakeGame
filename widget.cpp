@@ -12,12 +12,8 @@
 #include <QPushButton>
 #include <QSlider>
 
-Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
-{
+Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget){
     ui->setupUi(this);
-    srand(unsigned(time(NULL)));
     this->setFixedSize(MAP_WIDTH + CTRL_AREA, MAP_HEIGHT);
     this->setWindowTitle("Snake Game");
     timer = new QTimer(this);
@@ -33,29 +29,32 @@ Widget::Widget(QWidget *parent)
             do{
                 food->x = (arc4random() % (MAP_WIDTH / snake->size)) * snake->size;
                 food->y = (arc4random() % (MAP_HEIGHT / snake->size)) * snake->size;
-            }while(food->x == beforeX && food->y == beforeY);
+            }while((food->x == beforeX && food->y == beforeY) or food->inSnake(snake));
 
             score += 100;
             snake->length++;
 
             snake->coordinate[snake->length-1].y = snake->coordinate[snake->length-2].y;
             snake->coordinate[snake->length-1].x = snake->coordinate[snake->length-2].x;
-
         }
+        //Check if collide with the body
         for(int i = 1; i < snake->length; i++){
             if(snake->coordinate[0].x == snake->coordinate[i].x && snake->coordinate[0].y == snake->coordinate[i].y){
                 QMessageBox::information(this, "Message", "Your Score: " + QString::number(score));
                 initGame();
                 timer->stop();
                 playFlag = false;
+                startPauseBtn->setText("Start");
             }
         }
+        // Check if collide with the boundary
         if(snake->coordinate[0].x >= MAP_WIDTH || snake->coordinate[0].x < 0 ||
             snake->coordinate[0].y >= MAP_HEIGHT || snake->coordinate[0].y < 0){
             QMessageBox::information(this, "Message", "Your Score: " + QString::number(score));
             initGame();
             timer->stop();
             playFlag = false;
+            startPauseBtn->setText("Start");
         }
         update();
     });
@@ -69,29 +68,24 @@ void Widget::initGame(){
 }
 
 void Widget::initCtrl(){
-    QPushButton* startBtn = new QPushButton(this);
-    startBtn->setGeometry(MAP_WIDTH + 50, MAP_HEIGHT - 160, 100, 60);
-    startBtn->setText("Start");
+    startPauseBtn = new QPushButton(this);
+    startPauseBtn->setGeometry(MAP_WIDTH + 50, MAP_HEIGHT - 80, 100, 60);
+    startPauseBtn->setText("Start");
     QFont font;
     font.setPixelSize(22);
-    startBtn->setFont(font);
-    connect(startBtn, &QPushButton::clicked, [=](){
+    startPauseBtn->setFont(font);
+    connect(startPauseBtn, &QPushButton::clicked, [=](){
         if(playFlag){
-            return;
+            startPauseBtn->setText("Resume");
+            playFlag = false;
+            speed = 100;
+            timer->stop();
+        }else{
+            startPauseBtn->setText("Pause");
+            playFlag = true;
+            speed -= speedCtrl->value();
+            timer->start(speed);
         }
-        playFlag = true;
-        speed -= speedCtrl->value();
-        timer->start(speed);
-    });
-
-    QPushButton* closeBtn = new QPushButton(this);
-    closeBtn->setGeometry(MAP_WIDTH + 50, MAP_HEIGHT - 80, 100, 60);
-    closeBtn->setText("Pause");
-    closeBtn->setFont(font);
-    connect(closeBtn, &QPushButton::clicked, [=](){
-        playFlag = false;
-        speed = 100;
-        timer->stop();
     });
 
     QLabel* label = new QLabel("Speed", this);
@@ -161,8 +155,7 @@ void Widget::keyPressEvent(QKeyEvent *event){
     }
 }
 
-Widget::~Widget()
-{
+Widget::~Widget(){
     delete ui;
     delete snake;
     delete food;

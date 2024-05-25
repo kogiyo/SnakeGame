@@ -3,10 +3,10 @@
 
 #include "Snake.h"
 
-class Food
-{
+class Food{
 public:
     Food(Snake* snake);
+    bool inSnake(Snake* snake);
     int x;
     int y;
 };

@@ -15,13 +15,11 @@ enum Direction{
     RIGHT
 };
 
-class Snake
-{
+class Snake{
 public:
     Snake();
     void move();
 
-public:
     int length;
     int dir;
     int size;

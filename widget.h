@@ -5,6 +5,7 @@
 #include "Food.h"
 #include <QWidget>
 #include <QSlider>
+#include <QPushButton>
 
 #define MAP_WIDTH 800
 #define MAP_HEIGHT 600
@@ -14,8 +15,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
 QT_END_NAMESPACE
 
-class Widget : public QWidget
-{
+class Widget : public QWidget{
     Q_OBJECT
 
 public:
@@ -31,6 +31,7 @@ protected:
     Snake* snake;
     Food* food;
     QTimer* timer;
+    QPushButton* startPauseBtn = NULL;
     QSlider* speedCtrl = NULL;
     bool bugFlag = false;
     bool playFlag = false;
