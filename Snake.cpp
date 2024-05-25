@@ -49,3 +49,27 @@ void Snake::move(){
     }
     }
 }
+
+void Snake::grow(){
+    this->length++;
+    this->coordinate[this->length-1].y = this->coordinate[this->length-2].y;
+    this->coordinate[this->length-1].x = this->coordinate[this->length-2].x;
+}
+
+bool Snake::eatFood(int x, int y){
+    return (this->coordinate[0].x == x && this->coordinate[0].y == y);
+}
+
+bool Snake::collide(){
+    if(this->coordinate[0].x >= MAP_WIDTH || this->coordinate[0].x < 0 ||
+        this->coordinate[0].y >= MAP_HEIGHT || this->coordinate[0].y < 0){
+        return true;
+    }
+    for(int i = 1; i < this->length; i++){
+        if(this->coordinate[0].x == this->coordinate[i].x &&
+            this->coordinate[0].y == this->coordinate[i].y){
+            return true;
+        }
+    }
+    return false;
+}

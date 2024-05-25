@@ -23,7 +23,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget){
     connect(timer, &QTimer::timeout, [=](){
         snake->move();
 
-        if(snake->coordinate[0].x == food->x && snake->coordinate[0].y == food->y){
+        if(snake->eatFood(food->x, food->y)){
             int beforeX = food->x;
             int beforeY = food->y;
             do{
@@ -32,24 +32,10 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget){
             }while((food->x == beforeX && food->y == beforeY) or food->inSnake(snake));
 
             score += 100;
-            snake->length++;
+            snake->grow();
+        }
 
-            snake->coordinate[snake->length-1].y = snake->coordinate[snake->length-2].y;
-            snake->coordinate[snake->length-1].x = snake->coordinate[snake->length-2].x;
-        }
-        //Check if collide with the body
-        for(int i = 1; i < snake->length; i++){
-            if(snake->coordinate[0].x == snake->coordinate[i].x && snake->coordinate[0].y == snake->coordinate[i].y){
-                QMessageBox::information(this, "Message", "Your Score: " + QString::number(score));
-                initGame();
-                timer->stop();
-                playFlag = false;
-                startPauseBtn->setText("Start");
-            }
-        }
-        // Check if collide with the boundary
-        if(snake->coordinate[0].x >= MAP_WIDTH || snake->coordinate[0].x < 0 ||
-            snake->coordinate[0].y >= MAP_HEIGHT || snake->coordinate[0].y < 0){
+        if(snake->collide()){
             QMessageBox::information(this, "Message", "Your Score: " + QString::number(score));
             initGame();
             timer->stop();

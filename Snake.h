@@ -19,6 +19,9 @@ class Snake{
 public:
     Snake();
     void move();
+    void grow();
+    bool eatFood(int x, int y);
+    bool collide();
 
     int length;
     int dir;
