@@ -24,13 +24,7 @@ Widget::Widget(QWidget *parent): QWidget(parent), ui(new Ui::Widget){
         snake->move();
 
         if(snake->eatFood(food->x, food->y)){
-            int beforeX = food->x;
-            int beforeY = food->y;
-            do{
-                food->x = (arc4random() % (MAP_WIDTH / snake->size)) * snake->size;
-                food->y = (arc4random() % (MAP_HEIGHT / snake->size)) * snake->size;
-            }while((food->x == beforeX && food->y == beforeY) or food->inSnake(snake));
-
+            food->placeFood(snake);
             score += 100;
             snake->grow();
         }
